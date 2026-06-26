@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>作答 — 屏縣公正國中段考練習</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <a class="back-btn" href="index.html">← 返回</a>
+    <div>
+      <div id="exam-title" style="font-size:1.1rem;font-weight:700">載入中…</div>
+    </div>
+  </header>
+
+  <main class="exam-main">
+    <!-- 題卷說明 -->
+    <div class="exam-info-box">
+      <span class="title" id="exam-title-main"></span>
+      <span class="instructions" id="exam-instructions"></span>
+    </div>
+
+    <!-- 進度條 -->
+    <div class="progress-bar-wrap">
+      <div class="progress-bar" id="progress-bar" style="width:0%"></div>
+    </div>
+    <p class="progress-text" id="progress-text">已作答 0 題</p>
+
+    <!-- 題目列表 -->
+    <div class="questions-list" id="questions-list"></div>
+
+    <!-- 提交 / 重試 -->
+    <div class="submit-area">
+      <div class="score-panel" id="score-panel">
+        <div class="score-big">0</div>
+        <div class="score-total">/ 0 分</div>
+        <div class="score-pct"></div>
+        <div>
+          <span class="correct-count"></span>
+          <span class="wrong-count"></span>
+        </div>
+      </div>
+      <button class="btn-submit" id="btn-submit">計算成績</button>
+      <button class="btn-retry" id="btn-retry" style="display:none">重新作答</button>
+    </div>
+  </main>
+
+  <script src="js/questions.js"></script>
+  <script src="js/exam.js"></script>
+</body>
+</html>
