@@ -11,9 +11,17 @@ function normalize(s) {
   return s
     .trim()
     .replace(/\s+/g, '')               // 移除空白
-    .replace(/一/g, 'ㄧ')         // 數字「一」→ 注音ㄧ（容錯）
+    .replace(/一/g, 'ㄧ')             // 數字「一」→ 注音ㄧ（容錯）
     .replace(/[，,]/g, '、')           // 統一頓號
-    .toLowerCase();
+    // 是非題容錯：O/o/○ → ○；X/x/× → ×
+    .replace(/^[Oo]$/, '○')
+    .replace(/^[Xx×✗]$/, '×')
+    // 選擇題容錯：全形 → 半形大寫
+    .replace(/^[Ａａ]$/, 'A')
+    .replace(/^[Ｂｂ]$/, 'B')
+    .replace(/^[Ｃｃ]$/, 'C')
+    .replace(/^[Ｄｄ]$/, 'D')
+    .toUpperCase();
 }
 
 // ── 比對答案（支援多答案「、」分隔）──
@@ -61,15 +69,20 @@ function renderQuestions(exam) {
     item.className = 'question-item';
     item.id = `qi-${q.id}`;
 
-    const qText = q.q.replace(/「___」/g,
-      '<span style="color:var(--blue);font-weight:600">「　　　」</span>');
+    // 填空題：標示 「___」
+    let qHtml = q.q
+      .replace(/「___」/g, '<span style="color:var(--blue);font-weight:600">「　　　」</span>');
+    // 多行題目（健康教育選擇題含 \n）
+    qHtml = qHtml.replace(/\n/g, '<br>');
+
+    const placeholder = q.hint || '填入答案';
 
     item.innerHTML = `
       <div class="q-num">${q.id}.</div>
       <div class="q-body">
-        <div class="q-text">${qText}</div>
+        <div class="q-text">${qHtml}</div>
         <input class="q-input" type="text" id="input-${q.id}"
-               placeholder="填入答案" autocomplete="off"
+               placeholder="${placeholder}" autocomplete="off"
                aria-label="第 ${q.id} 題答案">
         <div class="q-result" id="result-${q.id}"></div>
       </div>`;

@@ -87,10 +87,11 @@ body {
   border-radius: 20px;
   margin-bottom: .75rem;
 }
-.badge-cn  { background: #fff3cd; color: #856404; }
-.badge-geo { background: #d1ecf1; color: #0c5460; }
-.badge-civ { background: #d4edda; color: #155724; }
-.badge-his { background: #f8d7da; color: #721c24; }
+.badge-cn     { background: #fff3cd; color: #856404; }
+.badge-geo    { background: #d1ecf1; color: #0c5460; }
+.badge-civ    { background: #d4edda; color: #155724; }
+.badge-his    { background: #f8d7da; color: #721c24; }
+.badge-health { background: #e8d5f5; color: #5a1d8a; }
 
 .exam-card h2 { font-size: 1.05rem; font-weight: 700; margin-bottom: .4rem; }
 .exam-card .meta { color: var(--gray); font-size: .83rem; }
