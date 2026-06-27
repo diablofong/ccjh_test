@@ -6,6 +6,31 @@ function decodeAnswer(b64) {
   return new TextDecoder().decode(bytes);
 }
 
+// ── Fisher-Yates 洗牌（回傳副本，不修改原陣列）──
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+// ── 判斷是否為注音答案 ──
+function isZhuyin(str) {
+  return /[ㄅ-ㄩ]/.test(str);
+}
+
+// ── 選擇題：點選按鈕 ──
+function selectMC(btn, qId, val) {
+  const container = btn.closest('.mc-options');
+  container.querySelectorAll('.mc-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('input-' + qId).value = val;
+  // 觸發進度更新（直接讀全域 exam）
+  if (window._currentExam) updateProgress(window._currentExam);
+}
+
 // ── 答案正規化（比對前統一處理）──
 function normalize(s) {
   return s
@@ -47,6 +72,7 @@ function initExam() {
     return;
   }
   const exam = EXAMS[key];
+  window._currentExam = exam;
   document.title = exam.title + ' — 屏縣公正國中';
   document.getElementById('exam-title').textContent = exam.title;
   document.getElementById('exam-title-main').textContent = exam.title;
@@ -61,10 +87,19 @@ function initExam() {
 // ── 渲染題目 ──
 function renderQuestions(exam) {
   const list = document.getElementById('questions-list');
-  const total = exam.questions.length;
   list.innerHTML = '';
 
-  exam.questions.forEach((q, idx) => {
+  // 收集所有注音答案作為干擾選項候選池
+  const zhuyinPool = [];
+  exam.questions.forEach(q => {
+    const ans = decodeAnswer(q.a);
+    if (isZhuyin(ans) && !zhuyinPool.includes(ans)) zhuyinPool.push(ans);
+  });
+
+  // 隨機排列題目（副本，不動原陣列）
+  const ordered = shuffle(exam.questions);
+
+  ordered.forEach((q) => {
     const item = document.createElement('div');
     item.className = 'question-item';
     item.id = `qi-${q.id}`;
@@ -75,22 +110,44 @@ function renderQuestions(exam) {
     // 多行題目（健康教育選擇題含 \n）
     qHtml = qHtml.replace(/\n/g, '<br>');
 
-    const placeholder = q.hint || '填入答案';
+    const correctAns = decodeAnswer(q.a);
 
-    item.innerHTML = `
-      <div class="q-num">${q.id}.</div>
-      <div class="q-body">
-        <div class="q-text">${qHtml}</div>
-        <input class="q-input" type="text" id="input-${q.id}"
-               placeholder="${placeholder}" autocomplete="off"
-               aria-label="第 ${q.id} 題答案">
-        <div class="q-result" id="result-${q.id}"></div>
-      </div>`;
+    if (isZhuyin(correctAns)) {
+      // 注音答案 → 選擇按鈕
+      const distractors = shuffle(zhuyinPool.filter(a => a !== correctAns)).slice(0, 3);
+      const options = shuffle([correctAns, ...distractors]);
+      const labels = ['A', 'B', 'C', 'D'];
+      const btnHtml = options.map((opt, i) =>
+        `<button class="mc-btn" onclick="selectMC(this, ${q.id}, '${opt.replace(/'/g, "\\'")}')">` +
+        `${labels[i]}. ${opt}</button>`
+      ).join('');
+
+      item.innerHTML = `
+        <div class="q-num">${q.id}.</div>
+        <div class="q-body">
+          <div class="q-text">${qHtml}</div>
+          <input type="hidden" id="input-${q.id}" value="">
+          <div class="mc-options">${btnHtml}</div>
+          <div class="q-result" id="result-${q.id}"></div>
+        </div>`;
+    } else {
+      // 一般填空題
+      const placeholder = q.hint || '填入答案';
+      item.innerHTML = `
+        <div class="q-num">${q.id}.</div>
+        <div class="q-body">
+          <div class="q-text">${qHtml}</div>
+          <input class="q-input" type="text" id="input-${q.id}"
+                 placeholder="${placeholder}" autocomplete="off"
+                 aria-label="第 ${q.id} 題答案">
+          <div class="q-result" id="result-${q.id}"></div>
+        </div>`;
+    }
     list.appendChild(item);
   });
 
   updateProgress(exam);
-  // 即時更新進度
+  // 即時更新進度（文字輸入框）
   list.querySelectorAll('.q-input').forEach(inp => {
     inp.addEventListener('input', () => updateProgress(exam));
   });
@@ -121,6 +178,10 @@ function submitExam(exam) {
     const correctText = decodeAnswer(q.a);
 
     input.disabled = true;
+    // 注音選擇題：禁用按鈕
+    document.getElementById(`qi-${q.id}`)
+      ?.querySelectorAll('.mc-btn')
+      .forEach(b => { b.disabled = true; });
 
     if (isOk) {
       correct++;

@@ -5,6 +5,36 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>作答 — 屏縣公正國中段考練習</title>
   <link rel="stylesheet" href="css/style.css">
+  <style>
+    .mc-options {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .5rem;
+      margin-top: .5rem;
+    }
+    .mc-btn {
+      padding: .45rem 1.1rem;
+      border: 2px solid var(--blue, #3b82f6);
+      border-radius: .5rem;
+      background: #fff;
+      color: var(--blue, #3b82f6);
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background .15s, color .15s;
+      font-family: inherit;
+    }
+    .mc-btn:hover:not(:disabled) {
+      background: #eff6ff;
+    }
+    .mc-btn.active {
+      background: var(--blue, #3b82f6);
+      color: #fff;
+    }
+    .mc-btn:disabled {
+      opacity: .65;
+      cursor: not-allowed;
+    }
+  </style>
 </head>
 <body>
   <header class="site-header">
