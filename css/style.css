@@ -92,6 +92,7 @@ body {
 .badge-civ    { background: #d4edda; color: #155724; }
 .badge-his    { background: #f8d7da; color: #721c24; }
 .badge-health { background: #e8d5f5; color: #5a1d8a; }
+.badge-bio    { background: #d4f5e0; color: #14532d; }
 
 .exam-card h2 { font-size: 1.05rem; font-weight: 700; margin-bottom: .4rem; }
 .exam-card .meta { color: var(--gray); font-size: .83rem; }
