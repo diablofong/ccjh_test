@@ -167,7 +167,7 @@ function updateProgress(exam) {
 
 // ── 提交評分 ──
 function submitExam(exam) {
-  let correct = 0, wrong = 0;
+  let correct = 0, wrong = 0, score = 0;
 
   exam.questions.forEach(q => {
     const input = document.getElementById(`input-${q.id}`);
@@ -185,6 +185,7 @@ function submitExam(exam) {
 
     if (isOk) {
       correct++;
+      score += (q.s || 1);
       item.classList.add('correct');
       resultEl.innerHTML = `<span class="ok-label">✓ 正確</span>`;
     } else {
@@ -200,7 +201,6 @@ function submitExam(exam) {
 
   // 顯示成績面板
   const total = exam.totalScore || exam.questions.length;
-  const score = correct;
   const pct = Math.round(score / total * 100);
 
   const panel = document.getElementById('score-panel');
